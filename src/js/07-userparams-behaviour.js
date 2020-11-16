@@ -24,13 +24,6 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function replaceParamsInNodes (node, key, value) {
-    if (node.parentElement) {
-      //console.log('Parent element %s', node.parentElement.nodeName)
-      if (node.parentElement.nodeName === 'code' ||
-        node.parentElement.nodeName === 'CODE') {
-        return
-      }
-    }
     if (node.nodeType === 3) {
       var text = node.data
       node.data = applyPattern(text, key, value)
