@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var queryString = window.location.search
     var appendQueryString = el.classList.contains('query-params-link') ||
       el.classList.contains('nav-link')
-    if (!hasQueryString(el.href) && queryString) {
+    if (el.href && !hasQueryString(el.href) && queryString) {
       var href = el.href
       for (var i = 0; i < keys.length; i++) {
         href = applyPattern(href, keys[i], allParams[keys[i]])
@@ -71,14 +71,30 @@ document.addEventListener('DOMContentLoaded', function () {
       } else {
         el.href = href
       }
-
+    } else {
+      // For links in image
+      if (el.classList.contains('imageblock')) {
+        var imageEl = el.querySelector('a.image')
+        var imageHref = imageEl.href
+        for (var j = 0; j < keys.length; j++) {
+          imageHref = applyPattern(imageHref, keys[j], allParams[keys[j]])
+        }
+        if (appendQueryString) {
+          imageEl.href = imageHref + queryString
+        } else {
+          imageEl.href = imageHref
+        }
+      }
     }
   }
 
   function applyPattern (str, key, value) {
-    //(%25key%25|%key%) %25 is urlencode value of %
-    var pattern = '(' + '%25' + key + '%25' +
-      '|(?<!-)' + '%' + key + '%' + '(?!-))'
+    //(%25key%25|%25lowercase(key)%25|%key%) %25 is urlencode value of %
+    var pattern = '(' +
+      '%25' + key + '%25' +
+      '|' + '%25' + key.toLowerCase() + '%25' +
+      '|' + '(?<!-)' + '%' + key + '%' + '(?!-)' +
+      ')'
     var re = new RegExp(pattern, 'gi')
     return str.replace(re, value)
   }
